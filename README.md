@@ -12,3 +12,9 @@ public static Grafo genGeografico(int n, double r, boolean dirigido, boolean aut
 
 Variante del modelo Gn,d Barabási-Albert. Colocar n vértices uno por uno, asignando a cada uno d aristas a vértices distintos de tal manera que la probabilidad de que el vértice nuevo se conecte a un vértice existente v es proporcional a la cantidad de aristas que v tiene actualmente - los primeros d vértices se conecta todos a todos. public static 
 Grafo genBarabasiAlbert(int n, double d, boolean dirigido, boolean auto);
+
+
+#############################
+La carpeta Grafo, contiene los arhivos del proyecto de la libreria
+
+La carpeta Grafos, contiene las clases .java para la generacion del grafo
