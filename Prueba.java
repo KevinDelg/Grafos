@@ -18,21 +18,21 @@ public class Prueba {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        Grafo uno = new Grafo(500);
-        uno.modeloER(75); //número de aristas
-        uno.escribirArchivo("Grafo-ER-500.gv");
-        
-        Grafo dos = new Grafo(500);
+        Grafo uno = new Grafo(30);//numero de nodos
+        uno.modeloER(250); //número de aristas
+        uno.escribirArchivo("Grafo-ER-30.gv");
+
+        Grafo dos = new Grafo(500);//numero de nodos
         dos.modeloGilbert(0.25); //número de aristas
         dos.escribirArchivo("Grafo-Gilbert-500.gv");
         
-        Grafo ocho = new Grafo(30, "geo");
-        ocho.modeloGeoSimple(0.3); //distancia a la que se deben conectar nodos
-        ocho.escribirArchivo("Grafo-Geo-30.gv");
-        
-        Grafo doce = new Grafo(500);
-        doce.modeloBA(75); //parámetro 'd' del modelo
-        doce.escribirArchivo("Grafo-BA-500.gv");
+        Grafo tres = new Grafo(30, "geo");//numero de nodos
+        tres.modeloGeoSimple(0.3); //distancia a la que se deben conectar nodos
+        tres.escribirArchivo("Grafo-Geo-30.gv");
+       
+        Grafo cuatro = new Grafo(500);//numero de nodos
+        cuatro.modeloBA(75); //parámetro 'd' del modelo
+        cuatro.escribirArchivo("Grafo-BA-500.gv");
     
     }
     
