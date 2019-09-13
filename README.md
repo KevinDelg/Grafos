@@ -15,6 +15,9 @@ Grafo genBarabasiAlbert(int n, double d, boolean dirigido, boolean auto);
 
 
 #############################
+
 La carpeta Grafo, contiene los arhivos del proyecto de la libreria
 
 La carpeta Grafos, contiene las clases .java para la generacion del grafo
+
+La carpeta Salidas contiene los archivos .gv y las imagenes de los grafos exportadas de Gephi
