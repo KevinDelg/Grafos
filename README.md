@@ -1,5 +1,6 @@
 # Grafos
 Proyecto 1 - Biblioteca de generación y manejo de grafos Escribir una biblioteca en Java para generar grafos aleatorios con los siguientes modelos de generación: 
+
 Modelo Gn,m de Erdös y Rényi. Crear n vértices y elegir uniformemente al azar m distintos pares de distintos vértices. 
 public static Grafo genErdosRenyi(int n, int m, boolean dirigido, boolean auto); 
 
