@@ -20,7 +20,7 @@ public class Grafo {
     private final int numVertices;
     private int numAristas;
     private static Formatter salida;
-
+    //constructores de los grafos 
     public Grafo(int numVertices) {
         this.numVertices = numVertices;
         this.vertex = new Vertice[numVertices];
@@ -111,7 +111,8 @@ public class Grafo {
 
         return salida.toString();
     }
-
+    //modelo Erdos Renyi
+    
     public void modeloER(int numAristas) {
         Random randomNum1 = new Random();
         Random randomNum2 = new Random();
@@ -126,7 +127,7 @@ public class Grafo {
         }
     }
 
-
+    //Modelo Gilbert
     public void modeloGilbert(double probabilidad) {
         Random randomNum = new Random();
 
@@ -141,7 +142,7 @@ public class Grafo {
         }
     }
 
-   
+    //modelo Geoespacial simple
     public void modeloGeoSimple(double r) {
         
         for (int i = 0; i < this.getNumNodes(); i++) {
@@ -153,7 +154,8 @@ public class Grafo {
             }
         }
     }
-
+    
+    //modelo Barabasi Albert
     public void modeloBA(int d) {
         Random volado = new Random();
         
