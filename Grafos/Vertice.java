@@ -49,8 +49,8 @@ public class Vertice {
 
     public void setDistance(double d) { this.distance = d; }
 
-  
+    //Variables para usar en el modelo geográfico simple  
     public double getX() { return x; }
-  //Variables para usar en el modelo geográfico simple
+    
     public double getY() { return y; }
 }
