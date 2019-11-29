@@ -14,127 +14,195 @@ import java.io.FileNotFoundException;
  */
 
 public class Grafo {
-
-    private Vertice[] vertex;
+    
+    private Vertice[] nodes;
     private HashMap<Vertice, HashSet<Vertice>> graph;
-    private final int numVertices;
-    private int numAristas;
-    private static Formatter salida;
-    //constructores de los grafos 
-    public Grafo(int numVertices) {
-        this.numVertices = numVertices;
-        this.vertex = new Vertice[numVertices];
-        this.graph = new HashMap<>();
-        for (int i = 0; i < numVertices; i++) {
-            Vertice n = new Vertice(i);
-            this.vertex[i] = n;
-            this.graph.put(n, new HashSet<>());
+    private HashMap<Vertice, HashSet<Arista>> dijkstraHash;
+    private int edgesNum;
+    private static Formatter output;
+    private Boolean weighted; 
+    private final int vertexNum;
+
+
+
+    public Grafo(int n) {
+        dijkstraHash = new HashMap<>();
+        graph = new HashMap<>();
+        vertexNum = n;
+        nodes = new Vertice[n];
+
+        for (int i = 0; i < n; i++) {
+            Vertice vertex = new Vertice(i);
+            nodes[i] = vertex;
+            graph.put(vertex, new HashSet<>());
+            dijkstraHash.put(vertex, new HashSet<>());
         }
+
+        weighted = false;
     }
 
-    public Grafo(int numVertices, String modelo) {
-        this.graph = new HashMap<>();
-        this.numVertices = numVertices;
-        this.vertex = new Vertice[numVertices];
-
+    public Grafo(int n, String modelo) {
+        dijkstraHash = new HashMap<>();
+        graph = new HashMap<>();
+        vertexNum = n;
+        nodes = new Vertice[n];
+        
         Random coordX = new Random();
         Random coordY = new Random();
-
+        
         if (modelo.equals("geo")) {
-            for (int i = 0; i < numVertices; i++) {
-                Vertice n = new Vertice(i, coordX.nextDouble(), coordY.nextDouble());
-
-                this.vertex[i] = n;
-                this.graph.put(n, new HashSet<>());
+            for (int i = 0; i < n; i++) {
+                Vertice vertex = new Vertice(i, coordX.nextDouble(), coordY.nextDouble());
+                nodes[i] = vertex;
+                graph.put(vertex, new HashSet<>());
+                dijkstraHash.put(vertex, new HashSet<>());
             }
         }
+        
+        weighted = false;
     }
 
-    private int gradoVertice(int i) {
-        Vertice n1 = this.getNode(i);
-        return this.graph.get(n1).size();
+    private int getGradoVertice(int i) {
+        return graph.get(getNode(i)).size();
     }
 
     private void conectarVertices(int i, int j) {
-        Vertice n1 = this.getNode(i);
-        Vertice n2 = this.getNode(j);
-
-        HashSet<Vertice> aristas1 = this.getEdges(i);
-        HashSet<Vertice> aristas2 = this.getEdges(j);
-
-        aristas1.add(n2);
-        aristas2.add(n1);
-        this.numAristas +=1;
+        Vertice vtx1 = getNode(i);
+        Vertice vtx2 = getNode(j);
+        HashSet<Vertice> edg1 = getEdge(i);
+        HashSet<Vertice> edg2 = getEdge(j);
+        edg1.add(vtx2);
+        edg2.add(vtx1); 
+        this.edgesNum += 1;
     }
 
-    private Boolean existeConexion(int i, int j) {
-        Vertice n1 = this.getNode(i);
-        Vertice n2 = this.getNode(j);
+    private Boolean hayConexion(int i, int j) {
+        Vertice vtx1 = getNode(i);
+        Vertice vtx2 = getNode(j);
+        HashSet<Vertice> edg1 = getEdge(i);
+        HashSet<Vertice> edg2 = getEdge(j);
 
-        HashSet<Vertice> aristas1 = this.getEdges(i);
-        HashSet<Vertice> aristas2 = this.getEdges(j);
-
-        return aristas1.contains(n2) || aristas2.contains(n1);
+        return edg1.contains(vtx2) || edg2.contains(vtx1);
     }
 
-    private double distanciaVertices(Vertice n1, Vertice n2) {
-        return Math.sqrt(Math.pow((n1.getX() - n2.getX()), 2) + Math.pow((n1.getY() - n2.getY()), 2));
+    private double distanciaVertices(Vertice vtx1, Vertice vtx2) {
+        return Math.sqrt(Math.pow((vtx1.getX() - vtx2.getX()), 2)
+                + Math.pow((vtx1.getY() - vtx2.getY()), 2));
     }
 
-    private int getNumNodes() {return numVertices;}
+    public int getNumNodes() {
+        return vertexNum;
+    }
 
-    private int getNumEdges() {return numAristas;}
+    public int getNumEdges() {
+        return edgesNum;
+    }
 
-    private Vertice getNode(int i) {return this.vertex[i];}
+    public Vertice getNode(int i) {
+        return nodes[i];
+    }
 
-    private HashSet<Vertice> getEdges(int i) {
-        Vertice n = this.getNode(i);
-        return this.graph.get(n);
+    public Boolean isWeighted() {
+        return weighted;
+    }
+
+    public HashSet<Vertice> getEdge(int i) {
+        return graph.get(getNode(i));
+    }
+
+    public HashSet<Arista> getWeightedEdges(int i) {
+        return dijkstraHash.get(getNode(i));
+    }
+
+    public void setWeighted() {
+        weighted = true;
+    }
+
+    public void setIncidencia(int i, HashSet<Arista> aristas) {
+        dijkstraHash.put(getNode(i), aristas);
+    }
+
+    public void setAristaPeso(int i, int j, double peso) {
+        if (!hayConexion(i, j)) { conectarVertices(i, j); }
+        
+        Arista edge1 = new Arista(i, j, peso);
+        Arista edge2 = new Arista(j, i, peso);
+        
+        HashSet<Arista> edges_i = getWeightedEdges(i);
+        HashSet<Arista> edges_j = getWeightedEdges(j);
+        
+        edges_i.add(edge1);
+        edges_j.add(edge2);
+        
+        setIncidencia(i, edges_i);
+        setIncidencia(j, edges_j);
+        
+        if (!isWeighted()) { setWeighted(); }
     }
 
     public String toString() {
-        StringBuilder salida;
-
-        salida = new StringBuilder("graph {\n");
-        for (int i = 0; i < this.getNumNodes(); i++) {
-            salida.append(this.getNode(i).getName()).append(";\n");
-        }
-
-        for (int i = 0; i < this.getNumNodes(); i++) {
-            HashSet<Vertice> aristas = this.getEdges(i);
-            for (Vertice n : aristas) {
-                salida.append(this.getNode(i).getName()).append(" -- ").append(n.getName()).append(";\n");
+        String cadena;
+        
+        if (isWeighted()) { 
+            cadena = "graph {\n";        
+            for (int i = 0; i < getNumNodes(); i++) {
+                cadena += getNode(i).getName() + " [label=\""
+                        + getNode(i).getName() + " (" + getNode(i).getDistance()
+                        + ")\"];\n";
             }
+            
+            for (int i = 0; i < getNumNodes(); i++) {
+                HashSet<Arista> edges = getWeightedEdges(i);
+                for (Arista e : edges) {
+                    cadena += e.getNode1() + " -- " + e.getNode2()
+                            + " [weight=" + e.getWeight() + "" + " label=" + e.getWeight() + ""
+                            + "];\n";
+                }
+            }
+            
+            cadena += "}\n";
+            
+        } else { 
+            cadena = "graph {\n";
+            for (int i = 0; i < getNumNodes(); i++) {
+                cadena += getNode(i).getName() + ";\n";
+            }
+            
+            for (int i = 0; i < getNumNodes(); i++) {
+                HashSet<Vertice> edges = getEdge(i);
+                for (Vertice n : edges) {
+                    cadena += getNode(i).getName() + " -- " + n.getName() + ";\n";
+                }
+            }
+            
+            cadena += "}\n";
         }
-
-        salida.append("}\n");
-
-        return salida.toString();
+        
+        return cadena;
     }
-    //modelo Erdos Renyi
-    
-    public void modeloER(int numAristas) {
-        Random randomNum1 = new Random();
-        Random randomNum2 = new Random();
-        while (this.getNumEdges() < numAristas) {
-            int num1 = randomNum1.nextInt(this.getNumNodes());
-            int num2 = randomNum2.nextInt(this.getNumNodes());
+
+
+    public void modeloER(int n) {
+        Random rand1 = new Random();
+        Random rand2 = new Random();
+
+        while (this.getNumEdges() < n) {
+            int num1 = rand1.nextInt(this.getNumNodes());
+            int num2 = rand2.nextInt(this.getNumNodes());
             if (num1 != num2) {
-                if (!existeConexion(num1, num2)) {
+                if (!hayConexion(num1, num2)) {
                     conectarVertices(num1, num2);
                 }
             }
         }
     }
 
-    //Modelo Gilbert
     public void modeloGilbert(double probabilidad) {
-        Random randomNum = new Random();
-
-        for (int i = 0; i < this.getNumNodes(); i++) {
-            for (int j = 0; j <this.getNumNodes(); j++) {
-                if ((i != j) && (randomNum.nextDouble() <= probabilidad)) {
-                    if (!existeConexion(i, j)) {
+        Random rand = new Random();
+        for (int i = 0; i < getNumNodes(); i++) {
+            for (int j = 0; j < getNumNodes(); j++) {
+                if ((i != j) && (rand.nextDouble() <= probabilidad)) {
+                    if (!hayConexion(i, j)) {
                         conectarVertices(i, j);
                     }
                 }
@@ -142,61 +210,142 @@ public class Grafo {
         }
     }
 
-    //modelo Geoespacial simple
     public void modeloGeoSimple(double r) {
-        
-        for (int i = 0; i < this.getNumNodes(); i++) {
-            for (int j = i + 1; j < this.getNumNodes(); j++) {
-                double distancia = distanciaVertices(this.getNode(i), this.getNode(j));
+        for (int i = 0; i < getNumNodes(); i++) {
+            for (int j = i + 1; j < getNumNodes(); j++) {
+                double distancia = distanciaVertices(getNode(i), getNode(j));
                 if (distancia <= r) {
                     conectarVertices(i, j);
                 }
             }
         }
     }
-    
-    //modelo Barabasi Albert
+
     public void modeloBA(int d) {
-        Random volado = new Random();
-        
-        double p;     
+        Random rand = new Random();
+        double p;
         for (int i = 0; i < this.getNumNodes();i++) {
             for (int j = (i+1); j < this.getNumNodes(); j++) {
                 
-                p = 1 - (gradoVertice(i)/d);
-
+                p = 1 - (getGradoVertice(i)/d);
+                
                 if (0 < p) {
-                    if ((!existeConexion(i,j))){
+                    if ((!hayConexion(i,j))){
                         conectarVertices(i, j);
                     }
                 }
             }
 
-            if (gradoVertice(i) >= d) { i++; }
+            if (getGradoVertice(i) >= d) { i++; }
         }
     }
 
-    public void escribirArchivo(String nombre) {
+    public void escribirArchivo(String file) {
         try {
-            salida = new Formatter(nombre);
+            output = new Formatter(file);
 
         } catch (SecurityException securityException) {
-            System.err.println("No hay permiso de escritura.");
+            System.err.println("Sin permisos de archivo.");
             System.exit(1);
 
         } catch (FileNotFoundException fileNotFoundException) {
-            System.err.println("Error al abrir el archivo.");
+            System.err.println("Error: No se pudo abrir archivo.");
             System.exit(1);
         }
 
+
         try {
-            salida.format("%s",this);
+            output.format("%s", this);
 
         } catch (FormatterClosedException formatterClosedException) {
-            System.err.println("Error al escribir al archivo");
+            System.err.println("Error: al escribir archivo");
         }
 
-        if (salida != null)
-            salida.close();
+
+        if (output != null) {
+            output.close();
+        }
     }
+    ////// SEGUNDA ENTREGA //////////
+
+    public Grafo BFS(int s) {
+        Grafo arbol = new Grafo(getNumNodes());
+        Boolean[] discovered = new Boolean[getNumNodes()];
+        PriorityQueue<Integer> queue = new PriorityQueue<>();
+        discovered[s] = true;
+
+        for (int i = 0; i < getNumNodes(); i++) {
+            if (i != s) {
+                discovered[i] = false;
+            }
+        }
+
+        queue.add(s);
+        while (queue.peek() != null) {
+            int u = queue.poll(); 
+            HashSet<Vertice> aristas = getEdge(u);
+
+            for (Vertice n : aristas) {
+                if (!discovered[n.getIndex()]) {
+                    arbol.conectarVertices(u, n.getIndex());
+                    discovered[n.getIndex()] = true;
+                    queue.add(n.getIndex());
+                }
+            }
+        }
+
+        return arbol;
+    }
+
+    public Grafo DFS_R(int s) {
+        Grafo arbol = new Grafo(getNumNodes());  
+        Boolean[] discovered = new Boolean[getNumNodes()];  
+        for (int i = 0; i < getNumNodes(); i++) {
+            discovered[i] = false;  
+        }
+
+        DFSIterator(s, discovered, arbol);
+        return arbol;
+    }
+
+    private void DFSIterator(int v, Boolean[] discovered, Grafo arbol) {
+        discovered[v] = true;
+        for (Vertice e : getEdge(v)) {
+            if (!discovered[e.getIndex()]) {
+                arbol.conectarVertices(v, e.getIndex());
+                DFSIterator(e.getIndex(), discovered, arbol);
+            }
+        }
+    }
+
+    public Grafo DFS_I(int s) {
+        Grafo arbol = new Grafo(getNumNodes());
+        Boolean[] explored = new Boolean[getNumNodes()];
+        Stack<Integer> stack = new Stack<>();
+        Integer[] parent = new Integer[getNumNodes()];
+        
+        for (int i = 0; i < getNumNodes(); i++) {
+            explored[i] = false;
+        }
+        
+        stack.push(s);
+        while (!stack.isEmpty()) {
+            int u = stack.pop();
+            if (!explored[u]) {
+                explored[u] = true;
+                if (u != s) {
+                    arbol.conectarVertices(u, parent[u]);
+                }
+                
+                for (Vertice e :  getEdge(u)) {
+                    stack.push(e.getIndex()); 
+                    parent[e.getIndex()] = u;
+                }
+            }
+        }
+        
+        return arbol;
+    }
+
+
 }
